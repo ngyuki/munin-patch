@@ -1,0 +1,33 @@
+--- LimitsOld.pm.orig	2016-03-22 13:44:10.427629500 +0900
++++ LimitsOld.pm	2016-03-22 13:57:29.867242600 +0900
+@@ -168,6 +168,13 @@
+         }
+     }
+ 
++    foreach my $workservice (@$work_array) {
++        my $service = munin_get_node_name($workservice);
++        my $parent = munin_get_parent($workservice);
++        my $name = munin_get_node_name($parent);
++        INFO "[INFO] find service \"$name :: $service\"";
++    }
++
+     # Process array containing services we need to check
+     foreach my $workservice (@$work_array) {
+         process_service($workservice);
+@@ -523,9 +530,13 @@
+             munin_set_var_loc(\%notes, [@$fpath, "state"], "ok");
+             munin_set_var_loc(\%notes, [@$fpath, "ok"],    "OK");
+ 
+-	    if ($oldstate ne 'ok') {
+-		$hash->{'state_changed'} = 1;
+-	    }
++            if ($oldstate ne 'ok') {
++                if ($oldstate eq '') {
++                    WARN "[WARNING] oldstate is none";
++                } else {
++                    $hash->{'state_changed'} = 1;
++                }
++            }
+         }
+     }
+     generate_service_message($hash);
